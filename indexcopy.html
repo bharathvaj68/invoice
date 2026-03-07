@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>HVAC DUCT WORKS - Invoice</title>
+
+<!-- Google Fonts (works on all devices) -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+
+:root {
+--accent: #3aaaff;
+--paper: #ececec;
+--ink: #141414;
+--line: #0c4ef5;
+}
+
+*{
+box-sizing:border-box;
+}
+
+body{
+margin:0;
+font-family:"Poppins",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+background:#dfdfdf;
+color:var(--ink);
+padding:24px 12px;
+}
+
+.invoice-sheet{
+width:min(210mm,100%);
+height:297mm;
+margin:0 auto;
+background:var(--paper);
+border:1px solid #d5d5d5;
+position:relative;
+overflow:hidden;
+}
+
+.top-bar{
+position:absolute;
+left:0;
+right:0;
+top:0;
+height:48mm;
+background:var(--accent);
+color:#fff;
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:0 10mm;
+}
+
+.brand{
+display:flex;
+align-items:center;
+gap:14px;
+}
+
+.logo-slot{
+width:118px;
+height:58px;
+display:flex;
+align-items:center;
+justify-content:center;
+flex-shrink:0;
+}
+
+.logo-image{
+max-width:100%;
+max-height:100%;
+object-fit:contain;
+}
+
+.brand-name{
+margin:0;
+font-size:28px;
+font-weight:700;
+letter-spacing:0.3px;
+}
+
+.brand-tagline{
+margin:2px 0 0;
+font-size:16px;
+}
+
+.contact{
+text-align:right;
+font-size:12px;
+line-height:1.7;
+}
+
+.contact-item{
+display:flex;
+align-items:center;
+justify-content:flex-end;
+gap:10px;
+margin:3px 0;
+}
+
+.contact-icon{
+width:15px;
+height:15px;
+stroke:#2e1212;
+fill:none;
+stroke-width:1.8;
+stroke-linecap:round;
+stroke-linejoin:round;
+}
+
+.main{
+position:absolute;
+top:48mm;
+left:0;
+right:0;
+bottom:14mm;
+padding:10mm 10mm 12mm;
+}
+
+.invoice-title{
+margin:0;
+text-align:center;
+font-size:45px;
+letter-spacing:2px;
+font-family:"Oswald",sans-serif;
+}
+
+.meta-row{
+margin-top:12mm;
+display:grid;
+grid-template-columns:1fr 320px;
+gap:16mm;
+}
+
+.bill-to h2,
+.meta-label{
+margin:0;
+font-size:16px;
+font-weight:600;
+}
+
+.customer-name{
+margin-top:8px;
+width:100%;
+border:0;
+background:transparent;
+font-size:35px;
+font-weight:600;
+outline:none;
+}
+
+.customer-address{
+margin-top:6px;
+width:100%;
+min-height:52px;
+border:0;
+background:transparent;
+resize:none;
+outline:none;
+font-family:inherit;
+font-size:15px;
+}
+
+.meta-item{
+display:grid;
+grid-template-columns:0.1px 1fr;
+align-items:center;
+margin-bottom:40px;
+gap:1px;
+margin-left: 30px;
+}
+
+.meta input{
+border:0;
+background:transparent;
+text-align:right;
+outline:none;
+font-size:16px;
+font-family:inherit;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+}
+
+.items{
+margin-top:20mm;
+border-top:1.5px solid var(--line);
+}
+
+.items th,
+.items td{
+border-bottom:1.5px solid var(--line);
+padding:8px 10px;
+font-size:13px;
+}
+
+.items th{
+text-align:left;
+font-weight:600;
+}
+
+.items th:nth-child(2),
+.items th:nth-child(3),
+.items th:nth-child(4),
+.items td:nth-child(2),
+.items td:nth-child(3),
+.items td:nth-child(4){
+text-align:center;
+}
+
+.items input{
+width:100%;
+border:0;
+background:transparent;
+outline:none;
+font-size:13px;
+font-family:inherit;
+}
+
+.delete-col{
+width:30px;
+}
+
+.delete-btn{
+border:0;
+background:transparent;
+color:#a21717;
+cursor:pointer;
+font-size:16px;
+font-weight:700;
+}
+
+.total-wrap{
+margin-top:10px;
+display:flex;
+justify-content:flex-end;
+}
+
+.total-row{
+width:230px;
+display:flex;
+/* justify-content:space-between; */
+gap:20px;
+font-size:27px;
+font-weight:600;
+}
+
+.signature-area{
+position:absolute;
+right:10mm;
+bottom:20mm;
+width:330px;
+text-align:center;
+}
+
+.signature-line{
+border-top:2px solid var(--accent);
+margin-bottom:8px;
+}
+
+.signature-name{
+margin:0;
+font-size:30px;
+font-family:"Brush Script MT","Segoe Script",cursive;
+}
+
+.bottom-bar{
+position:absolute;
+left:0;
+right:0;
+bottom:0;
+height:14mm;
+background:var(--accent);
+color:#fff;
+display:grid;
+place-items:center;
+font-size:17px;
+}
+
+.actions{
+width:min(210mm,100%);
+margin:10px auto 0;
+display:flex;
+justify-content:center;
+gap:10px;
+}
+
+.actions button{
+border:0;
+border-radius:8px;
+padding:10px 16px;
+font-size:14px;
+font-weight:600;
+cursor:pointer;
+font-family:inherit;
+}
+
+.btn-add{
+background:#2f7b42;
+color:#fff;
+}
+
+.btn-download{
+background:#1c4ba0;
+color:#fff;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="invoice-sheet" id="invoiceSheet">
+
+<header class="top-bar">
+
+<div class="brand">
+<div class="logo-slot">
+<img class="logo-image" src="logo.png">
+</div>
+
+<div>
+<p class="brand-name">HVAC DUCT WORKS</p>
+<p class="brand-tagline">Professional Air Solutions</p>
+</div>
+</div>
+
+<div class="contact">
+<div class="contact-item">+91 63748 63292 / +91 94459 10146</div>
+<div class="contact-item">rockp8680@gmail.com</div>
+<div class="contact-item">Nugumbal, Cheyyur, 603313</div>
+</div>
+
+</header>
+
+<main class="main">
+
+<h1 class="invoice-title">INVOICE</h1>
+
+<section class="meta-row">
+
+<div class="bill-to">
+<h2>Invoice to:</h2>
+<input class="customer-name" placeholder="Customer Name">
+<textarea class="customer-address" placeholder="Customer address"></textarea>
+</div>
+
+<div class="meta">
+
+<div class="meta-item">
+<label class="meta-label">Invoice#</label>
+<input id="invoiceNo" placeholder="52131">
+</div>
+
+<div class="meta-item">
+<label class="meta-label">Date</label>
+<input id="currentDate" type="date">
+</div>
+
+</div>
+
+</section>
+
+<table class="items" id="itemTable">
+
+<thead>
+<tr>
+<th style="width:52%">Item</th>
+<th style="width:14%">Quantity</th>
+<th style="width:14%">Unit Price</th>
+<th style="width:16%">Total</th>
+<th class="delete-col"></th>
+</tr>
+</thead>
+
+<tbody>
+
+<tr>
+<td><input placeholder="Item description"></td>
+<td><input type="number" class="qty" value="0" oninput="calculate()"></td>
+<td><input type="number" class="rate" value="0" oninput="calculate()"></td>
+<td class="amt">₹0.00</td>
+<td class="delete-col">
+<button class="delete-btn" onclick="deleteRow(this)">X</button>
+</td>
+</tr>
+
+</tbody>
+</table>
+
+<div class="total-wrap">
+<div class="total-row">
+<span>Total</span>
+<span id="grandTotal">₹0.00</span>
+</div>
+</div>
+
+<div class="signature-area">
+<div class="signature-line"></div>
+<p class="signature-name">v.prakash</p>
+</div>
+
+</main>
+
+<footer class="bottom-bar">
+Thank you for your business!
+</footer>
+
+</div>
+
+<div class="actions">
+<button class="btn-add" onclick="addRow()">+ Add Item</button>
+<button class="btn-download" onclick="downloadPDF()">Download PDF</button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<script>
+
+document.getElementById("currentDate").valueAsDate=new Date()
+
+function formatMoney(v){
+return "₹"+v.toFixed(2)
+}
+
+function addRow(){
+
+const tbody=document.querySelector("#itemTable tbody")
+
+const row=document.createElement("tr")
+
+row.innerHTML=`
+<td><input placeholder="Item description"></td>
+<td><input type="number" class="qty" value="0" oninput="calculate()"></td>
+<td><input type="number" class="rate" value="0" oninput="calculate()"></td>
+<td class="amt">₹0.00</td>
+<td class="delete-col"><button class="delete-btn" onclick="deleteRow(this)">X</button></td>
+`
+
+tbody.appendChild(row)
+
+}
+
+function deleteRow(btn){
+
+const tbody=document.querySelector("#itemTable tbody")
+
+if(tbody.rows.length===1)return
+
+btn.closest("tr").remove()
+
+calculate()
+
+}
+
+function calculate(){
+
+const rows=document.querySelectorAll("#itemTable tbody tr")
+
+let total=0
+
+rows.forEach(row=>{
+
+const q=parseFloat(row.querySelector(".qty").value)||0
+const r=parseFloat(row.querySelector(".rate").value)||0
+
+const amount=q*r
+
+row.querySelector(".amt").textContent=formatMoney(amount)
+
+total+=amount
+
+})
+
+document.getElementById("grandTotal").textContent=formatMoney(total)
+
+}
+
+function downloadPDF(){
+
+const invoice=document.getElementById("invoiceSheet")
+
+html2pdf().from(invoice).save("invoice.pdf")
+
+}
+
+calculate()
+
+</script>
+
+</body>
+</html>
