@@ -1,185 +1,246 @@
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HVAC DUCT WORKS - Professional Invoice</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
             --gold-bg: #e3c477;
             --text-dark: #333;
+            --icon-size: 16px;
         }
         * { box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
-        body { background: #525659; margin: 0; padding: 20px; }
-
-        /* A4 Portrait Styling */
-        .page {
-            width: 210mm;
-            min-height: 297mm;
+        
+        body { 
+            background: #525659; 
+            margin: 0; 
             padding: 0;
-            margin: auto;
-            background: white;
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
             display: flex;
-            flex-direction: column;
+            justify-content: center;
         }
 
-        /* Gold Header Section */
+        /* REMOVES WHITE BORDER & DETAILS */
+        @page {
+            size: A4 portrait;
+            margin: 0 !important; 
+        }
+
+        /* Main Wrapper */
+        .print-wrapper {
+            width: 210mm;
+            min-height: 297mm;
+            background: white;
+            margin: 20px 0;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            border-collapse: collapse;
+            table-layout: fixed;
+            position: relative;
+        }
+
+        /* HEADER */
         .header-gold {
             background-color: var(--gold-bg);
             color: white;
-            padding: 40px 60px;
+            padding: 50px 60px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-        .brand h1 { margin: 0; font-size: 42px; font-weight: 600; letter-spacing: 1px; }
-        .brand p { margin: 0; font-size: 18px; text-transform: uppercase; letter-spacing: 2px; }
-        .header-contact { text-align: right; font-size: 14px; line-height: 1.6; }
+        .header-contact { text-align: right; font-weight: 500; font-size: 15px; gap:2px; line-height: 1.8; }
+        .contact-item { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
+        .contact-item a { color: white; text-decoration: none; }
 
-        /* Invoice Body */
-        .invoice-content { padding: 60px; flex-grow: 1; }
+        /* BODY CONTENT */
+        .invoice-body-container {
+            padding: 40px 60px;
+            /* This is the key: The content area must leave room for the footer 
+               even in the website preview */
+            padding-bottom: 100px; 
+        }
+
         .invoice-title { 
-            text-align: center; 
-            font-size: 48px; 
-            letter-spacing: 8px; 
-            margin-bottom: 50px; 
-            color: var(--text-dark);
+            text-align: center; font-size: 48px; letter-spacing: 10px; 
+            margin-bottom: 40px; color: var(--text-dark); font-weight: 300;
         }
 
-        .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 50px; }
-        .meta-label { font-weight: bold; font-size: 18px; margin-bottom: 10px; }
-        .meta-value { font-size: 16px; border: none; width: 100%; outline: none; }
+        .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 30px; }
+        .meta-label { font-weight: bold; font-size: 17px; margin-bottom: 5px; color: var(--text-dark); }
+        .clean-input { border: none !important; background: transparent; width: 100%; outline: none; font-size: 16px; color: #555; }
 
-        /* Table Styling */
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th { 
-            text-align: left; 
-            border-bottom: 2px solid var(--text-dark); 
-            padding: 15px 5px; 
-            font-size: 16px; 
-        }
-        td { padding: 15px 5px; border-bottom: 1px solid #eee; }
-        input.table-input { border: none; width: 100%; font-size: 15px; outline: none; }
+        /* TABLE */
+        .items-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        .items-table th { text-align: left; border-bottom: 2px solid var(--text-dark); padding: 12px 5px; }
+        .items-table td { padding: 15px 5px; border-bottom: 1px solid #eee; }
         
+        tr { page-break-inside: avoid; }
+        input.table-input { border: none; width: 100%; font-size: 15px; outline: none; background: transparent; }
+        .remove-btn { color: #ff4d4d; background: none; border: none; font-size: 20px; cursor: pointer; }
+
         .total-section { 
-            margin-top: 30px; 
-            display: flex; 
-            justify-content: flex-end; 
-            align-items: center;
-            gap: 50px;
-            font-size: 24px;
-            font-weight: bold;
+            margin-top: 30px;
+            display: flex; justify-content: flex-end; 
+            align-items: center; gap: 20px; font-size: 24px; font-weight: bold;
         }
 
-        /* Footer Signature */
-        .signature-area { margin-top: 100px; text-align: right; padding-right: 10px; }
-        .sig-line { width: 250px; border-top: 2px solid var(--gold-bg); display: inline-block; }
-        .sig-name { font-family: "Brush Script MT", "Segoe Script", 'Cursive' , sans-serif; font-size: 28px; margin-top: 10px; }
+        .signature-area { margin-top: 50px; text-align: right; padding-right: 10px; }
+        .sig-name { font-family: "Brush Script MT", cursive; font-size: 30px; }
+        .sig-line { width: 220px; border-top: 2px solid var(--gold-bg); display: inline-block; }
 
+        /* PREVIEW & PRINT STICKY FOOTER */
         .footer-gold {
             background-color: var(--gold-bg);
             color: white;
             text-align: center;
-            padding: 15px;
+            padding: 20px;
             font-size: 18px;
-            margin-top: auto;
+            width: 100%;
+            /* Fixed at bottom of container for Website Preview */
+            position: absolute;
+            bottom: 0;
+            left: 0;
         }
 
-        /* UI Controls */
+        /* Safety Buffer for both Web and Print */
+        .content-safety-buffer {
+            height: 120px; /* Adjust this to match your footer height plus some gap */
+            display: block;
+        }
+
+        /* CONTROLS */
         .controls { 
-            position: fixed; top: 20px; left: 20px; background: white; padding: 15px; 
-            border-radius: 8px; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            position: fixed; top: 10px; left: 10px; background: white; padding: 10px; 
+            border-radius: 8px; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            display: flex; flex-direction: column; gap: 8px;
         }
-        button { 
-            display: block; width: 100%; padding: 10px; margin-bottom: 10px;
-            cursor: pointer; background: #333; color: white; border: none; border-radius: 4px;
+        button.ui-btn { width: 120px; padding: 10px; cursor: pointer; background: #333; color: white; border: none; border-radius: 4px; font-weight: 600; }
+        button.add { background: var(--gold-bg); color: #333; }
+
+        @media screen and (max-width: 210mm) {
+            .print-wrapper {
+                transform: scale(calc(100vw / 225mm));
+                transform-origin: top center;
+                margin: 0;
+            }
+            .controls { top: auto; bottom: 20px; left: 50%; transform: translateX(-50%); flex-direction: row; }
         }
-        button.add { background: #28a745; }
 
         @media print {
-            body { background: none; padding: 0; }
-            .controls { display: none; }
-            .page { box-shadow: none; margin: 0; width: 210mm; height: 297mm; }
-            input::placeholder { color: transparent; }
+            body { background: none; display: block; }
+            .controls, .remove-col, .remove-btn { display: none !important; }
+            .print-wrapper { 
+                margin: 0 !important; 
+                width: 210mm !important; 
+                box-shadow: none; 
+                transform: none;
+                border: none;
+            }
+            /* Ensures sticky footer stays at the bottom of every printed page */
+            .footer-gold {
+                position: fixed;
+                bottom: 0;
+            }
         }
     </style>
 </head>
 <body>
 
 <div class="controls">
-    <button class="add" onclick="addRow()">+ Add Item</button>
-    <button onclick="window.print()">Generate PDF</button>
+    <button class="ui-btn add" onclick="addRow()">+ Add Item</button>
+    <button class="ui-btn" onclick="window.print()">Generate PDF</button>
 </div>
 
-<div class="page">
-    <div class="header-gold">
-        <div class="brand">
-            <h1>HVAC</h1>
-            <p>Duct Works</p>
-        </div>
-        <div class="header-contact">
-            📞 63748 63292, 9445910146<br>
-            ✉️ rockp8680@gmail.com<br>
-            📍 Nugumbal (Near by Bus Stand),<br>
-            Cheyyur T.K, CPT D.T 603 313
-        </div>
-    </div>
-
-    <div class="invoice-content">
-        <div class="invoice-title">INVOICE</div>
-
-        <div class="meta-grid">
-            <div>
-                <div class="meta-label">Invoice to:</div>
-                <input class="meta-value" placeholder="Customer Name">
-                <input class="meta-value" placeholder="Customer Address Line 1">
-                <input class="meta-value" placeholder="City, State, Zip">
-            </div>
-            <div style="text-align: right;">
-                <div style="display: inline-block; text-align: left;">
-                    <div class="meta-label">Invoice# <input type="text" style="width: 80px; font-weight: normal;" placeholder="52131"></div>
-                    <div class="meta-label">Date <input type="text" id="dateInput" style="width: 120px; font-weight: normal; border-bottom: 1px solid #ccc;"></div>
+<table class="print-wrapper">
+    <thead>
+        <tr>
+            <td>
+                <div class="header-gold">
+                    <div class="brand">
+                        <img src="logo-bg.png" alt="Logo" style="height: 85px;">
+                    </div>
+                    <div class="header-contact">
+                        <div class="contact-item"><a href="tel:+916374863292">63748 63292</a>, <a href="tel:+919445910146">9445910146</a> <i data-lucide="phone" style="height: 20px;"></i></div>
+                        <div class="contact-item"><a href="mailto:rockp8680@gmail.com">rockp8680@gmail.com</a> <i data-lucide="mail" style="height: 20px; "></i></div>
+                        <div class="contact-item"><a href="#" target="_blank">Nugumbal, Cheyyur T.K, CPT D.T 603 313</a> <i data-lucide="map-pin" style="height: 20px;"></i></div>
+                    </div>
                 </div>
-            </div>
-        </div>
+            </td>
+        </tr>
+    </thead>
 
-        <table id="itemTable">
-            <thead>
-                <tr>
-                    <th style="width: 60%;">Item</th>
-                    <th style="width: 10%; text-align: center;">Quantity</th>
-                    <th style="width: 15%; text-align: center;">Unit Price</th>
-                    <th style="width: 15%; text-align: right;">Total</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><input class="table-input" placeholder="Enter service or product name"></td>
-                    <td><input type="number" class="table-input qty" value="0" style="text-align: center;" oninput="calc()"></td>
-                    <td><input type="number" class="table-input price" value="0" style="text-align: center;" oninput="calc()"></td>
-                    <td style="text-align: right; font-weight: bold;">₹<span class="row-total">0</span></td>
-                </tr>
-            </tbody>
-        </table>
+    <tbody>
+        <tr>
+            <td>
+                <div class="invoice-body-container">
+                    <div class="invoice-title">INVOICE</div>
 
-        <div class="total-section">
-            <span>Total</span>
-            <span style="color: var(--text-dark);">₹<span id="grandTotal">0</span></span>
-        </div>
+                    <div class="meta-grid">
+                        <div>
+                            <div class="meta-label">Invoice to:</div>
+                            <input class="clean-input" placeholder="Customer Name">
+                            <input class="clean-input" placeholder="Address">
+                            <input class="clean-input" placeholder="City, State, Zip">
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="display: inline-block; text-align: left;">
+                                <div class="meta-label">Invoice #<input type="text" class="clean-input" style="width: 80px;" placeholder="52131"></div>
+                                <div class="meta-label">Date <input type="text" id="dateInput" class="clean-input" style="width: 120px;"></div>
+                            </div>
+                        </div>
+                    </div>
 
-        <div class="signature-area">
-            <div class="sig-line"></div>
-            <div class="sig-name">V. Prakash</div>
-        </div>
-    </div>
+                    <table class="items-table" id="itemTable">
+                        <thead>
+                            <tr>
+                                <th style="width: 55%;">Item</th>
+                                <th style="width: 12%; text-align: center;">Qty</th>
+                                <th style="width: 15%; text-align: center;">Price</th>
+                                <th style="width: 18%; text-align: right;">Total</th>
+                                <th class="remove-col" style="width: 30px;"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><input class="table-input" placeholder="Description"></td>
+                                <td><input type="number" class="table-input qty" value="0" style="text-align: center;" oninput="calc()"></td>
+                                <td><input type="number" class="table-input price" value="0" style="text-align: center;" oninput="calc()"></td>
+                                <td style="text-align: right; font-weight: bold;">₹<span class="row-total">0</span></td>
+                                <td class="remove-col"><button class="remove-btn" onclick="removeRow(this)">×</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
 
-    <div class="footer-gold">
-        Thank you for your business!
-    </div>
-</div>
+                    <div class="total-section">
+                        <span>Grand Total</span>
+                        <span>₹<span id="grandTotal">0</span></span>
+                    </div>
+
+                    <div class="signature-area">
+                        <div class="sig-line"></div>
+                        <div class="sig-name">V. PRAKASH</div>
+                    </div>
+
+                    <div class="content-safety-buffer"></div>
+                </div>
+            </td>
+        </tr>
+    </tbody>
+
+    <tfoot>
+        <tr>
+            <td>
+                <div class="footer-gold">
+                    Thank you for your business!
+                </div>
+            </td>
+        </tr>
+    </tfoot>
+</table>
 
 <script>
-    // Set default date format
+    lucide.createIcons();
+    
     const today = new Date();
     document.getElementById('dateInput').value = today.getDate().toString().padStart(2, '0') + ' / ' + (today.getMonth()+1).toString().padStart(2, '0') + ' / ' + today.getFullYear();
 
@@ -187,26 +248,546 @@
         const tbody = document.querySelector("#itemTable tbody");
         const row = tbody.insertRow();
         row.innerHTML = `
-            <td><input class="table-input" placeholder="Enter service or product name"></td>
+            <td><input class="table-input" placeholder="Description"></td>
             <td><input type="number" class="table-input qty" value="0" style="text-align: center;" oninput="calc()"></td>
             <td><input type="number" class="table-input price" value="0" style="text-align: center;" oninput="calc()"></td>
             <td style="text-align: right; font-weight: bold;">₹<span class="row-total">0</span></td>
+            <td class="remove-col"><button class="remove-btn" onclick="removeRow(this)">×</button></td>
         `;
     }
 
+    function removeRow(btn) { btn.closest('tr').remove(); calc(); }
+
     function calc() {
-        const rows = document.querySelectorAll("#itemTable tbody tr");
         let grand = 0;
-        rows.forEach(row => {
-            const q = row.querySelector(".qty").value || 0;
-            const p = row.querySelector(".price").value || 0;
+        document.querySelectorAll("#itemTable tbody tr").forEach(row => {
+            const q = parseFloat(row.querySelector(".qty").value) || 0;
+            const p = parseFloat(row.querySelector(".price").value) || 0;
             const total = q * p;
-            row.querySelector(".row-total").innerText = total.toLocaleString();
+            row.querySelector(".row-total").innerText = total.toLocaleString('en-IN');
             grand += total;
         });
-        document.getElementById("grandTotal").innerText = grand.toLocaleString();
+        document.getElementById("grandTotal").innerText = grand.toLocaleString('en-IN');
     }
 </script>
-
 </body>
 </html>
+
+<!-- 
+/code 2
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HVAC DUCT WORKS - Professional Multi-Page Invoice</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --gold-bg: #e3c477;
+            --text-dark: #333;
+        }
+
+        /* 1. CLEAN PRINT RESET */
+        @page {
+            size: A4 portrait;
+            margin: 0 !important;
+        }
+
+        * { box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+        
+        body { 
+            background: #525659; 
+            margin: 0; 
+            padding: 0;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        /* 2. TABLE STRUCTURE FOR MULTI-PAGE REPEAT */
+        .invoice-container {
+            width: 100%;
+            max-width: 210mm;
+            margin: 0 auto;
+            background: white;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        /* 3. HEADER: Full-bleed inside thead */
+        .header-gold {
+            background-color: var(--gold-bg) !important;
+            color: white !important;
+            padding: 50px 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header-contact { text-align: right; font-size: 14px; line-height: 1.8; }
+        .contact-item { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
+        .contact-item a { color: white !important; text-decoration: none; }
+
+        /* 4. BODY: With 100px safety buffer */
+        .invoice-body-container {
+            padding: 40px 60px;
+            padding-bottom: 100px; 
+            min-height: 200mm;
+        }
+
+        .invoice-title { 
+            text-align: center; font-size: 48px; letter-spacing: 10px; 
+            margin-bottom: 40px; color: var(--text-dark); font-weight: 300;
+        }
+
+        .meta-grid { display: flex; justify-content: space-between; margin-bottom: 30px; gap: 20px; }
+        .meta-label { font-weight: bold; font-size: 17px; margin-bottom: 5px; color: var(--text-dark); }
+        .clean-input { border: none !important; background: transparent; width: 100%; outline: none; font-size: 16px; color: #555; }
+
+        /* 5. ITEMS TABLE */
+        .items-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        .items-table th { text-align: left; border-bottom: 2px solid var(--text-dark); padding: 12px 5px; }
+        .items-table td { padding: 15px 5px; border-bottom: 1px solid #eee; }
+        
+        /* Prevents a single row from breaking across two pages */
+        tr { page-break-inside: avoid; } 
+
+        input.table-input { border: none; width: 100%; font-size: 15px; outline: none; background: transparent; }
+        .remove-btn { color: #ff4d4d; background: none; border: none; font-size: 20px; cursor: pointer; }
+
+        .total-section { 
+            margin-top: 30px; display: flex; justify-content: flex-end; 
+            align-items: center; gap: 20px; font-size: 24px; font-weight: bold;
+        }
+
+        .signature-area { margin-top: 50px; text-align: right; }
+        .sig-name { font-family: "Brush Script MT", cursive; font-size: 32px; }
+        .sig-line { width: 220px; border-top: 2px solid var(--gold-bg); display: inline-block; }
+
+        /* 6. FOOTER: repeats on every page via tfoot */
+        .footer-gold {
+            background-color: var(--gold-bg) !important;
+            color: white !important;
+            text-align: center;
+            padding: 20px;
+            font-size: 18px;
+            width: 100%;
+        }
+
+        /* 7. CONTROLS */
+        .controls { 
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); 
+            background: white; padding: 12px 25px; border-radius: 50px; 
+            z-index: 1000; box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            display: flex; gap: 15px;
+        }
+        .ui-btn { padding: 12px 24px; cursor: pointer; border: none; border-radius: 25px; font-weight: bold; }
+        .add-btn { background: var(--gold-bg); color: #333; }
+        .pdf-btn { background: #333; color: white; }
+
+        @media screen and (max-width: 210mm) {
+            .invoice-container { margin: 0; }
+            .header-gold, .invoice-body-container { padding-left: 20px; padding-right: 20px; }
+        }
+
+        @media print {
+            body { background: white; }
+            .controls, .remove-col, .remove-btn { display: none !important; }
+            .invoice-container { width: 100% !important; margin: 0 !important; }
+            
+            /* The MAGIC for multi-page headers/footers */
+            thead { display: table-header-group; }
+            tfoot { display: table-footer-group; }
+            
+            /* Ensures footer stays at the very bottom of the page */
+            .footer-gold {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="controls">
+    <button class="ui-btn add-btn" onclick="addRow()">+ Add Item</button>
+    <button class="ui-btn pdf-btn" onclick="window.print()">Generate PDF</button>
+</div>
+
+<table class="invoice-container">
+    <thead>
+        <tr>
+            <td>
+                <div class="header-gold">
+                    <div class="brand">
+                        <img src="logo-bg.png" alt="HVAC LOGO" style="height: 70px; filter: brightness(0) invert(1);">
+                    </div>
+                    <div class="header-contact">
+                        <div class="contact-item"><a href="tel:+916374863292">63748 63292</a>, <a href="tel:+919445910146">9445910146</a> <i data-lucide="phone"></i></div>
+                        <div class="contact-item"><a href="mailto:rockp8680@gmail.com">rockp8680@gmail.com</a> <i data-lucide="mail"></i></div>
+                        <div class="contact-item">Nugumbal, Cheyyur T.K, CPT D.T 603 313 <i data-lucide="map-pin"></i></div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </thead>
+
+    <tbody>
+        <tr>
+            <td>
+                <div class="invoice-body-container">
+                    <div class="invoice-title">INVOICE</div>
+
+                    <div class="meta-grid">
+                        <div style="flex: 1;">
+                            <div class="meta-label">Invoice to:</div>
+                            <input class="clean-input" placeholder="Customer Name">
+                            <input class="clean-input" placeholder="Customer Address">
+                        </div>
+                        <div style="text-align: right; flex: 1;">
+                            <div class="meta-label">Invoice #: <input class="clean-input" style="width: 80px;" placeholder="52131"></div>
+                            <div class="meta-label">Date: <input id="dateInput" class="clean-input" style="width: 110px;"></div>
+                        </div>
+                    </div>
+
+                    <table class="items-table" id="itemTable">
+                        <thead>
+                            <tr>
+                                <th style="width: 55%;">Item Description</th>
+                                <th style="width: 10%; text-align: center;">Qty</th>
+                                <th style="width: 15%; text-align: center;">Price</th>
+                                <th style="width: 20%; text-align: right;">Total</th>
+                                <th class="remove-col" style="width: 40px;"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><input class="table-input" placeholder="Description of work"></td>
+                                <td><input type="number" class="table-input qty" value="0" style="text-align: center;" oninput="calc()"></td>
+                                <td><input type="number" class="table-input price" value="0" style="text-align: center;" oninput="calc()"></td>
+                                <td style="text-align: right; font-weight: bold;">₹<span class="row-total">0</span></td>
+                                <td class="remove-col"><button class="remove-btn" onclick="removeRow(this)">×</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="total-section">
+                        <span>Grand Total:</span>
+                        <span>₹<span id="grandTotal">0</span></span>
+                    </div>
+
+                    <div class="signature-area">
+                        <div class="sig-line"></div>
+                        <div class="sig-name">V. PRAKASH</div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </tbody>
+
+    <tfoot>
+        <tr>
+            <td>
+                <div class="footer-gold">
+                    Thank you for your business!
+                </div>
+            </td>
+        </tr>
+    </tfoot>
+</table>
+
+<script>
+    lucide.createIcons();
+    const today = new Date();
+    document.getElementById('dateInput').value = today.toLocaleDateString('en-GB').split('/').join(' / ');
+
+    function addRow() {
+        const tbody = document.querySelector("#itemTable tbody");
+        const row = tbody.insertRow();
+        row.innerHTML = `
+            <td><input class="table-input" placeholder="Description of work"></td>
+            <td><input type="number" class="table-input qty" value="0" style="text-align: center;" oninput="calc()"></td>
+            <td><input type="number" class="table-input price" value="0" style="text-align: center;" oninput="calc()"></td>
+            <td style="text-align: right; font-weight: bold;">₹<span class="row-total">0</span></td>
+            <td class="remove-col"><button class="remove-btn" onclick="removeRow(this)">×</button></td>
+        `;
+    }
+
+    function removeRow(btn) { btn.closest('tr').remove(); calc(); }
+
+    function calc() {
+        let grand = 0;
+        document.querySelectorAll("#itemTable tbody tr").forEach(row => {
+            const q = parseFloat(row.querySelector(".qty").value) || 0;
+            const p = parseFloat(row.querySelector(".price").value) || 0;
+            const total = q * p;
+            row.querySelector(".row-total").innerText = total.toLocaleString('en-IN');
+            grand += total;
+        });
+        document.getElementById("grandTotal").innerText = grand.toLocaleString('en-IN');
+    }
+</script>
+</body>
+</html> -->
+
+<!-- 
+                    FINAL CODE DRAFT
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HVAC DUCT WORKS - Professional Multi-Page Invoice</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --gold-bg: #e3c477;
+            --text-dark: #333;
+        }
+
+        /* 1. CLEAN PRINT RESET */
+        @page {
+            size: A4 portrait;
+            margin: 0 !important;
+        }
+
+        * { box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+        
+        body { 
+            background: #525659; 
+            margin: 0; 
+            padding: 0;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        /* 2. TABLE STRUCTURE FOR MULTI-PAGE REPEAT */
+        .invoice-container {
+            width: 100%;
+            max-width: 210mm;
+            margin: 0 auto;
+            background: white;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        /* 3. HEADER: Full-bleed inside thead */
+        .header-gold {
+            background-color: var(--gold-bg) !important;
+            color: white !important;
+            padding: 50px 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header-contact { text-align: right; font-size: 14px; line-height: 1.8; }
+        .contact-item { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
+        .contact-item a { color: white !important; text-decoration: none; }
+
+        /* 4. BODY: With 100px safety buffer */
+        .invoice-body-container {
+            padding: 40px 60px;
+            padding-bottom: 100px; 
+            min-height: 200mm;
+        }
+
+        .invoice-title { 
+            text-align: center; font-size: 48px; letter-spacing: 10px; 
+            margin-bottom: 40px; color: var(--text-dark); font-weight: 300;
+        }
+
+        .meta-grid { display: flex; justify-content: space-between; margin-bottom: 30px; gap: 20px; }
+        .meta-label { font-weight: bold; font-size: 17px; margin-bottom: 5px; color: var(--text-dark); }
+        .clean-input { border: none !important; background: transparent; width: 100%; outline: none; font-size: 16px; color: #555; }
+
+        /* 5. ITEMS TABLE */
+        .items-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        .items-table th { text-align: left; border-bottom: 2px solid var(--text-dark); padding: 12px 5px; }
+        .items-table td { padding: 15px 5px; border-bottom: 1px solid #eee; }
+        
+        /* Prevents a single row from breaking across two pages */
+        tr { page-break-inside: avoid; } 
+
+        input.table-input { border: none; width: 100%; font-size: 15px; outline: none; background: transparent; }
+        .remove-btn { color: #ff4d4d; background: none; border: none; font-size: 20px; cursor: pointer; }
+
+        .total-section { 
+            margin-top: 30px; display: flex; justify-content: flex-end; 
+            align-items: center; gap: 20px; font-size: 24px; font-weight: bold;
+        }
+
+        .signature-area { margin-top: 50px; text-align: right; }
+        .sig-name { font-family: "Brush Script MT", cursive; font-size: 32px; }
+        .sig-line { width: 220px; border-top: 2px solid var(--gold-bg); display: inline-block; }
+
+        /* 6. FOOTER: repeats on every page via tfoot */
+        .footer-gold {
+            background-color: var(--gold-bg) !important;
+            color: white !important;
+            text-align: center;
+            padding: 20px;
+            font-size: 18px;
+            width: 100%;
+        }
+
+        /* 7. CONTROLS */
+        .controls { 
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); 
+            background: white; padding: 12px 25px; border-radius: 50px; 
+            z-index: 1000; box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            display: flex; gap: 15px;
+        }
+        .ui-btn { padding: 12px 24px; cursor: pointer; border: none; border-radius: 25px; font-weight: bold; }
+        .add-btn { background: var(--gold-bg); color: #333; }
+        .pdf-btn { background: #333; color: white; }
+
+        @media screen and (max-width: 210mm) {
+            .invoice-container { margin: 0; }
+            .header-gold, .invoice-body-container { padding-left: 20px; padding-right: 20px; }
+        }
+
+        @media print {
+            body { background: white; }
+            .controls, .remove-col, .remove-btn { display: none !important; }
+            .invoice-container { width: 100% !important; margin: 0 !important; }
+            
+            /* The MAGIC for multi-page headers/footers */
+            thead { display: table-header-group; }
+            tfoot { display: table-footer-group; }
+            
+            /* Ensures footer stays at the very bottom of the page */
+            .footer-gold {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="controls">
+    <button class="ui-btn add-btn" onclick="addRow()">+ Add Item</button>
+    <button class="ui-btn pdf-btn" onclick="window.print()">Generate PDF</button>
+</div>
+
+<table class="invoice-container">
+    <thead>
+        <tr>
+            <td>
+                <div class="header-gold">
+                    <div class="brand">
+                        <img src="logo-bg.png" alt="HVAC LOGO" style="height: 70px; filter: brightness(0) invert(1);">
+                    </div>
+                    <div class="header-contact">
+                        <div class="contact-item"><a href="tel:+916374863292">63748 63292</a>, <a href="tel:+919445910146">9445910146</a> <i data-lucide="phone"></i></div>
+                        <div class="contact-item"><a href="mailto:rockp8680@gmail.com">rockp8680@gmail.com</a> <i data-lucide="mail"></i></div>
+                        <div class="contact-item"><a href="https://maps.app.goo.gl/QnFsokZ5aa7HmGoGA" target="_blank">Nugumbal, Cheyyur T.K, CPT D.T 603 313</a> <i data-lucide="map-pin"></i></div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </thead>
+
+    <tbody>
+        <tr>
+            <td>
+                <div class="invoice-body-container">
+                    <div class="invoice-title">INVOICE</div>
+
+                    <div class="meta-grid">
+                        <div style="flex: 1;">
+                            <div class="meta-label">Invoice to:</div>
+                            <input class="clean-input" placeholder="Customer Name">
+                            <input class="clean-input" placeholder="Customer Address Line 1">
+                            <input class="clean-input" placeholder="City, State, Pincode">
+                        </div>
+                        <div style="text-align: right; flex: 1;">
+                            <div class="meta-label">Invoice #<input class="clean-input" style="width: 80px;" placeholder="52131"></div>
+                            <div class="meta-label">Date: <input id="dateInput" class="clean-input" style="width: 110px;"></div>
+                        </div>
+                    </div>
+
+                    <table class="items-table" id="itemTable">
+                        <thead>
+                            <tr>
+                                <th style="width: 55%;">Item Description</th>
+                                <th style="width: 10%; text-align: center;">Qty</th>
+                                <th style="width: 15%; text-align: center;">Price</th>
+                                <th style="width: 20%; text-align: right;">Total</th>
+                                <th class="remove-col" style="width: 40px;"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><input class="table-input" placeholder="Description of work"></td>
+                                <td><input type="number" class="table-input qty" value="0" style="text-align: center;" oninput="calc()"></td>
+                                <td><input type="number" class="table-input price" value="0" style="text-align: center;" oninput="calc()"></td>
+                                <td style="text-align: right; font-weight: bold;">₹<span class="row-total">0</span></td>
+                                <td class="remove-col"><button class="remove-btn" onclick="removeRow(this)">×</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="total-section">
+                        <span>Grand Total:</span>
+                        <span>₹<span id="grandTotal">0</span></span>
+                    </div>
+
+                    <div class="signature-area">
+                        <div class="sig-line"></div>
+                        <div class="sig-name">V. PRAKASH</div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </tbody>
+
+    <tfoot>
+        <tr>
+            <td>
+                <div class="footer-gold">
+                    Thank you for your business!
+                </div>
+            </td>
+        </tr>
+    </tfoot>
+</table>
+
+<script>
+    lucide.createIcons();
+    const today = new Date();
+    document.getElementById('dateInput').value = today.toLocaleDateString('en-GB').split('/').join(' / ');
+
+    function addRow() {
+        const tbody = document.querySelector("#itemTable tbody");
+        const row = tbody.insertRow();
+        row.innerHTML = `
+            <td><input class="table-input" placeholder="Description of work"></td>
+            <td><input type="number" class="table-input qty" value="0" style="text-align: center;" oninput="calc()"></td>
+            <td><input type="number" class="table-input price" value="0" style="text-align: center;" oninput="calc()"></td>
+            <td style="text-align: right; font-weight: bold;">₹<span class="row-total">0</span></td>
+            <td class="remove-col"><button class="remove-btn" onclick="removeRow(this)">×</button></td>
+        `;
+    }
+
+    function removeRow(btn) { btn.closest('tr').remove(); calc(); }
+
+    function calc() {
+        let grand = 0;
+        document.querySelectorAll("#itemTable tbody tr").forEach(row => {
+            const q = parseFloat(row.querySelector(".qty").value) || 0;
+            const p = parseFloat(row.querySelector(".price").value) || 0;
+            const total = q * p;
+            row.querySelector(".row-total").innerText = total.toLocaleString('en-IN');
+            grand += total;
+        });
+        document.getElementById("grandTotal").innerText = grand.toLocaleString('en-IN');
+    }
+</script>
+</body>
+</html>
+
+-->
