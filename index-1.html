@@ -1,0 +1,212 @@
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HVAC DUCT WORKS - Professional Invoice</title>
+    <style>
+        :root {
+            --gold-bg: #e3c477;
+            --text-dark: #333;
+        }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+        body { background: #525659; margin: 0; padding: 20px; }
+
+        /* A4 Portrait Styling */
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 0;
+            margin: auto;
+            background: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Gold Header Section */
+        .header-gold {
+            background-color: var(--gold-bg);
+            color: white;
+            padding: 40px 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .brand h1 { margin: 0; font-size: 42px; font-weight: 600; letter-spacing: 1px; }
+        .brand p { margin: 0; font-size: 18px; text-transform: uppercase; letter-spacing: 2px; }
+        .header-contact { text-align: right; font-size: 14px; line-height: 1.6; }
+
+        /* Invoice Body */
+        .invoice-content { padding: 60px; flex-grow: 1; }
+        .invoice-title { 
+            text-align: center; 
+            font-size: 48px; 
+            letter-spacing: 8px; 
+            margin-bottom: 50px; 
+            color: var(--text-dark);
+        }
+
+        .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 50px; }
+        .meta-label { font-weight: bold; font-size: 18px; margin-bottom: 10px; }
+        .meta-value { font-size: 16px; border: none; width: 100%; outline: none; }
+
+        /* Table Styling */
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { 
+            text-align: left; 
+            border-bottom: 2px solid var(--text-dark); 
+            padding: 15px 5px; 
+            font-size: 16px; 
+        }
+        td { padding: 15px 5px; border-bottom: 1px solid #eee; }
+        input.table-input { border: none; width: 100%; font-size: 15px; outline: none; }
+        
+        .total-section { 
+            margin-top: 30px; 
+            display: flex; 
+            justify-content: flex-end; 
+            align-items: center;
+            gap: 50px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        /* Footer Signature */
+        .signature-area { margin-top: 100px; text-align: right; padding-right: 10px; }
+        .sig-line { width: 250px; border-top: 2px solid var(--gold-bg); display: inline-block; }
+        .sig-name { font-family: "Brush Script MT", "Segoe Script", 'Cursive' , sans-serif; font-size: 28px; margin-top: 10px; }
+
+        .footer-gold {
+            background-color: var(--gold-bg);
+            color: white;
+            text-align: center;
+            padding: 15px;
+            font-size: 18px;
+            margin-top: auto;
+        }
+
+        /* UI Controls */
+        .controls { 
+            position: fixed; top: 20px; left: 20px; background: white; padding: 15px; 
+            border-radius: 8px; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        button { 
+            display: block; width: 100%; padding: 10px; margin-bottom: 10px;
+            cursor: pointer; background: #333; color: white; border: none; border-radius: 4px;
+        }
+        button.add { background: #28a745; }
+
+        @media print {
+            body { background: none; padding: 0; }
+            .controls { display: none; }
+            .page { box-shadow: none; margin: 0; width: 210mm; height: 297mm; }
+            input::placeholder { color: transparent; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="controls">
+    <button class="add" onclick="addRow()">+ Add Item</button>
+    <button onclick="window.print()">Generate PDF</button>
+</div>
+
+<div class="page">
+    <div class="header-gold">
+        <div class="brand">
+            <h1>HVAC</h1>
+            <p>Duct Works</p>
+        </div>
+        <div class="header-contact">
+            📞 63748 63292, 9445910146<br>
+            ✉️ rockp8680@gmail.com<br>
+            📍 Nugumbal (Near by Bus Stand),<br>
+            Cheyyur T.K, CPT D.T 603 313
+        </div>
+    </div>
+
+    <div class="invoice-content">
+        <div class="invoice-title">INVOICE</div>
+
+        <div class="meta-grid">
+            <div>
+                <div class="meta-label">Invoice to:</div>
+                <input class="meta-value" placeholder="Customer Name">
+                <input class="meta-value" placeholder="Customer Address Line 1">
+                <input class="meta-value" placeholder="City, State, Zip">
+            </div>
+            <div style="text-align: right;">
+                <div style="display: inline-block; text-align: left;">
+                    <div class="meta-label">Invoice# <input type="text" style="width: 80px; font-weight: normal;" placeholder="52131"></div>
+                    <div class="meta-label">Date <input type="text" id="dateInput" style="width: 120px; font-weight: normal; border-bottom: 1px solid #ccc;"></div>
+                </div>
+            </div>
+        </div>
+
+        <table id="itemTable">
+            <thead>
+                <tr>
+                    <th style="width: 60%;">Item</th>
+                    <th style="width: 10%; text-align: center;">Quantity</th>
+                    <th style="width: 15%; text-align: center;">Unit Price</th>
+                    <th style="width: 15%; text-align: right;">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><input class="table-input" placeholder="Enter service or product name"></td>
+                    <td><input type="number" class="table-input qty" value="0" style="text-align: center;" oninput="calc()"></td>
+                    <td><input type="number" class="table-input price" value="0" style="text-align: center;" oninput="calc()"></td>
+                    <td style="text-align: right; font-weight: bold;">₹<span class="row-total">0</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="total-section">
+            <span>Total</span>
+            <span style="color: var(--text-dark);">₹<span id="grandTotal">0</span></span>
+        </div>
+
+        <div class="signature-area">
+            <div class="sig-line"></div>
+            <div class="sig-name">V. Prakash</div>
+        </div>
+    </div>
+
+    <div class="footer-gold">
+        Thank you for your business!
+    </div>
+</div>
+
+<script>
+    // Set default date format
+    const today = new Date();
+    document.getElementById('dateInput').value = today.getDate().toString().padStart(2, '0') + ' / ' + (today.getMonth()+1).toString().padStart(2, '0') + ' / ' + today.getFullYear();
+
+    function addRow() {
+        const tbody = document.querySelector("#itemTable tbody");
+        const row = tbody.insertRow();
+        row.innerHTML = `
+            <td><input class="table-input" placeholder="Enter service or product name"></td>
+            <td><input type="number" class="table-input qty" value="0" style="text-align: center;" oninput="calc()"></td>
+            <td><input type="number" class="table-input price" value="0" style="text-align: center;" oninput="calc()"></td>
+            <td style="text-align: right; font-weight: bold;">₹<span class="row-total">0</span></td>
+        `;
+    }
+
+    function calc() {
+        const rows = document.querySelectorAll("#itemTable tbody tr");
+        let grand = 0;
+        rows.forEach(row => {
+            const q = row.querySelector(".qty").value || 0;
+            const p = row.querySelector(".price").value || 0;
+            const total = q * p;
+            row.querySelector(".row-total").innerText = total.toLocaleString();
+            grand += total;
+        });
+        document.getElementById("grandTotal").innerText = grand.toLocaleString();
+    }
+</script>
+
+</body>
+</html>
